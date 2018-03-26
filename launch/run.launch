@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="command" default="" />
+
+  <node pkg="run_script" type="run.py" name="run_script" output="screen" >
+    <param name="commands" value="$(arg command)" />
+  </node>
+</launch>
