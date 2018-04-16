@@ -1,13 +1,22 @@
 # run_script
 
-A node to run scripts so that you can put in your launch file.
+A node to run scripts so that you can put in your launch file. Say you
+want to run `~/some_script.bash` with a certain delay. You will be
+able to do the following:
+
+```xml
+<node name="run_script" pkg="run_script" type="run.py" >
+  <param name="commands" value="~/some_script.bash" />
+  <param name="delay" value="5" />
+</node>
+```
 
 
 ## Usage (from ROS parameters)
 
-Parameters you can set:
+Here is an example of the parameters you can set:
 
-```
+```yaml
 shell: bash
 commands:
   - some
@@ -17,7 +26,7 @@ commands:
 # How long (in seconds) to wait before running the first command
 delay: 0
 # How long (in seconds) to wait between each command
-interval 0
+interval: 0
 ```
 
 ```
@@ -31,7 +40,7 @@ will be executed. The commands are executed by default via `bash -c COMMAND`,
 unless an empty string or `nil` is specified for the `shell` parameter.
 
 ```
-rr run_script run.py _commands:='echo "hello"' _shell:=nil
+rosrun run_script run.py _commands:='echo "hello"' _shell:=nil
 Traceback (most recent call last):
   File "/home/naoki/ros/workspaces/lunar/common/src/run_script/nodes/run.py", line 31, in <module>
     subprocess.call(command)
@@ -49,7 +58,7 @@ The error occurs because it tries to execute a command (file) with the name
 
 Another example using a YAML file:
 
-```
+```yaml
 shell: zsh
 commands:
   - ls
@@ -81,11 +90,38 @@ hello
 Mon Mar 26 20:52:14 JST 2018
 ```
 
+An example of running a script from a launch file:
+
+```xml
+<?xml version="1.0"?>
+<launch>
+  <node name="run_script" pkg="run_script" type="run.py" >
+    <param name="command" value="echo 'hello, world!'" />
+  </node>
+</launch>
+```
+
 When both command line arguments and ROS parameters are provided, the ROS
-parameters are prioritized.
+parameters are prioritized. That is, if the following launch file is used:
+
+```xml
+<?xml version="1.0"?>
+<launch>
+  <node name="run_script" pkg="run_script" type="run.py" args="date" >
+    <param name="commands" value="echo 'hello, world!'" />
+  </node>
+</launch>
+```
+
+`echo 'hello, world!'` is executed.
 
 
-## Usage (from a launch file)
+## Usage (from the bundled launch file)
+
+There is a launch file that is provided with the package, which you can use to
+execute **one** command (but you can execute multiple commands if you really
+want to by using `&&` and/or `;`). Note that the `arg` is the singular
+`command` and not `commands`.
 
 ```xml
 <?xml version="1.0"?>
